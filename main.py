@@ -14,14 +14,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from cv.database import Base, engine, get_db
+from database import Base, engine, get_db
 from db_models import (
     DatosPersonalesDB,
     ExperienciaLaboralDB,
     FormacionAcademicaDB,
     HabilidadDB,
 )
-from cv.models import DatosPersonales, ExperienciaLaboral, FormacionAcademica, Habilidad
+from models import DatosPersonales, ExperienciaLaboral, FormacionAcademica, Habilidad
 
 # Crea las tablas en la base de datos si todavía no existen.
 Base.metadata.create_all(bind=engine)
@@ -60,13 +60,16 @@ async def manejador_errores_generales(request: Request, exc: Exception):
 # Frontend (página HTML que consume la API)
 # ------------------------------------------------------------------
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 @app.get("/", include_in_schema=False)
 def serve_frontend():
     """Sirve la página HTML que consume la API y muestra el CV visualmente."""
-    return FileResponse("static/index.html")
+    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 
 # ------------------------------------------------------------------

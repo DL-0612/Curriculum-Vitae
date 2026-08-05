@@ -95,6 +95,25 @@ script SQL manualmente. Si quieres verlas, en Supabase ve a
    del CV. En Supabase, el **Table Editor** debería mostrar las tablas
    ya creadas con los datos que vayas agregando.
 
+## Despliegue en Vercel (alternativa)
+
+Vercel ejecuta Python como funciones serverless (no un servidor
+tradicional), así que el proyecto incluye dos archivos extra solo para
+esto: `vercel.json` (configuración de rutas) y `api/index.py` (adapta
+la app de FastAPI a ese formato usando Mangum). Render/Railway no
+necesitan estos archivos.
+
+1. Sube el proyecto a GitHub (si no lo has hecho).
+2. En [vercel.com](https://vercel.com), **Add New → Project** y
+   selecciona tu repositorio.
+3. En **Environment Variables**, agrega `DATABASE_URL`. Como Vercel
+   puede levantar varias funciones al mismo tiempo, usa mejor la URI
+   del **Connection pooler** de Supabase (puerto `6543`) en vez de la
+   conexión directa, para no agotar las conexiones de la base de datos.
+4. Despliega. Vercel te da una URL como `https://tu-proyecto.vercel.app`.
+5. Prueba `https://tu-proyecto.vercel.app/cv` y
+   `https://tu-proyecto.vercel.app/docs`.
+
 ## Endpoints
 
 | Método | Ruta | Descripción |
