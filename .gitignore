@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+cv_local.db
+cv_data.json
+venv/
+.venv/

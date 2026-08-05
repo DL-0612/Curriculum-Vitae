@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV · API REST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EEE4;
+    --panel:#FFFFFF;
+    --ink:#1E2620;
+    --ink-soft:#5B6259;
+    --accent:#2F5D50;
+    --accent-soft:#E4EDE9;
+    --line:#D8D3C4;
+    --get:#3A6EA5;
+    --post:#3F7D4F;
+    --put:#B8862B;
+    --delete:#B4453A;
+    --radius:2px;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    line-height:1.55;
+  }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:48px 24px 96px;
+  }
+
+  /* ---------- Masthead ---------- */
+
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:24px;
+    margin-bottom:8px;
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 10px;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:44px;
+    line-height:1.05;
+    margin:0 0 12px;
+    letter-spacing:-.01em;
+  }
+
+  .tagline{
+    color:var(--ink-soft);
+    max-width:56ch;
+    margin:0 0 14px;
+  }
+
+  .contact-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 14px;
+  }
+
+  .contact-line span::before{
+    content:"·";
+    margin-right:14px;
+    color:var(--line);
+  }
+  .contact-line span:first-child::before{ content:none; margin:0; }
+
+  /* ---------- Folder tabs nav ---------- */
+
+  nav.tabs{
+    display:flex;
+    gap:2px;
+    margin:28px 0 40px;
+    border-bottom:1px solid var(--line);
+  }
+  nav.tabs a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    text-decoration:none;
+    color:var(--ink-soft);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-bottom:none;
+    padding:9px 14px 8px;
+    border-radius:var(--radius) var(--radius) 0 0;
+    position:relative;
+    top:1px;
+  }
+  nav.tabs a:hover{ color:var(--ink); background:var(--accent-soft); }
+
+  /* ---------- Sections ---------- */
+
+  section{ margin-bottom:52px; scroll-margin-top:20px; }
+
+  .section-head{
+    border-bottom:1px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:20px;
+  }
+
+  .section-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+  }
+
+  /* ---------- Cards ---------- */
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-bottom:12px;
+  }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .card h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:17px;
+    margin:0 0 2px;
+  }
+  .card .meta{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+  }
+  .card .desc{
+    margin:0;
+    font-size:14px;
+  }
+  .card-actions{
+    display:flex;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .card-actions button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:4px 8px;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  .card-actions button:hover{ border-color:var(--ink); color:var(--ink); }
+  .card-actions button.danger:hover{ border-color:var(--delete); color:var(--delete); }
+
+  .empty-hint{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-style:italic;
+    padding:6px 0 14px;
+  }
+
+  /* ---------- Forms ---------- */
+
+  form.entry-form{
+    background:var(--accent-soft);
+    border:1px dashed var(--accent);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-top:6px;
+  }
+  form.entry-form.hidden{ display:none; }
+
+  .field{ margin-bottom:12px; }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .field input, .field textarea, .field select{
+    width:100%;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:8px 9px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+
+  .form-actions{ display:flex; gap:10px; margin-top:4px; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:var(--radius);
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn.secondary{
+    background:none;
+    color:var(--ink-soft);
+    border-color:var(--line);
+  }
+  .btn:hover{ opacity:.9; }
+
+  .add-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    background:none;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .add-btn:hover{ background:var(--ink); color:#fff; }
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    left:auto;
+    background:var(--ink);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:var(--radius);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    box-shadow:0 6px 20px rgba(0,0,0,.2);
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none;
+    z-index:100;
+    max-width:min(360px, calc(100vw - 48px));
+  }
+  .toast.show{ opacity:1; transform:translateY(0); }
+  .toast.err{ background:var(--delete); }
+
+  @media (max-width:560px){
+    h1{ font-size:32px; }
+    .field-row{ flex-direction:column; }
+    .console-panel{ width:calc(100vw - 32px); left:16px; right:16px; }
+  }
+
+  /* ---------- Spinner ---------- */
+
+  .spinner{
+    display:inline-block;
+    width:11px; height:11px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .6s linear infinite;
+    margin-right:7px;
+    vertical-align:-1px;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  button:disabled{ opacity:.65; cursor:default; }
+
+  /* ---------- Confirmación inline de eliminar ---------- */
+
+  .confirm-text{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    align-self:center;
+  }
+  .card-actions button.btn-mini-danger{
+    background:var(--delete);
+    border-color:var(--delete);
+    color:#fff;
+  }
+  .card-actions button.btn-mini-danger:hover{ opacity:.9; color:#fff; }
+
+  /* ---------- Animaciones de tarjetas ---------- */
+
+  .card{
+    max-height:600px;
+    transition: opacity .3s ease, transform .3s ease, max-height .3s ease,
+                margin .3s ease, padding .3s ease, border-width .3s ease;
+    overflow:hidden;
+  }
+  .card.card-removing{
+    opacity:0;
+    transform:scale(.97);
+    max-height:0;
+    margin-bottom:0;
+    padding-top:0;
+    padding-bottom:0;
+    border-width:0;
+  }
+
+  @keyframes fadeInUp{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .fade-in{ animation:fadeInUp .35s ease; }
+
+  /* ---------- Consola de peticiones API ---------- */
+
+  .console-toggle{
+    position:fixed;
+    bottom:24px;
+    left:24px;
+    z-index:90;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:9px 14px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+  }
+  .console-toggle:hover{ opacity:.9; }
+  .console-count{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:10px;
+    padding:1px 6px;
+    border-radius:10px;
+    margin-left:6px;
+  }
+
+  .console-panel{
+    position:fixed;
+    bottom:68px;
+    left:24px;
+    width:400px;
+    max-width:calc(100vw - 48px);
+    max-height:60vh;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+    z-index:90;
+    display:flex;
+    flex-direction:column;
+  }
+  .console-panel.hidden{ display:none; }
+
+  .console-panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .console-panel-head button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:3px 8px;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  .console-panel-head button:hover{ border-color:var(--ink); color:var(--ink); }
+
+  .console-log{
+    overflow-y:auto;
+    padding:6px 14px;
+  }
+  .console-entry{
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .console-entry:last-child{ border-bottom:none; }
+  .console-entry-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+  }
+  .console-method{
+    color:#fff;
+    padding:1px 6px;
+    border-radius:var(--radius);
+    font-weight:500;
+    flex-shrink:0;
+  }
+  .console-method.get{ background:var(--get); }
+  .console-method.post{ background:var(--post); }
+  .console-method.put{ background:var(--put); }
+  .console-method.delete{ background:var(--delete); }
+  .console-url{
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    flex:1;
+  }
+  .console-status{
+    color:var(--post);
+    font-weight:500;
+  }
+  .console-status.err{ color:var(--delete); }
+  .console-entry details{ margin-top:4px; }
+  .console-entry summary{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .console-entry pre{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:8px;
+    margin:4px 0 0;
+    white-space:pre-wrap;
+    word-break:break-word;
+    max-height:160px;
+    overflow-y:auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Currículum · servido desde /cv</p>
+    <h1 id="cv-nombre">Cargando…</h1>
+    <p class="tagline" id="cv-resumen"></p>
+    <div class="contact-line" id="cv-contacto"></div>
+  </header>
+
+  <div id="toast" class="toast"></div>
+
+  <button id="console-toggle" class="console-toggle" type="button">&lt;/&gt; Consola API <span id="console-count" class="console-count">0</span></button>
+  <div id="console-panel" class="console-panel hidden">
+    <div class="console-panel-head">
+      <span>Peticiones a la API</span>
+      <button id="console-clear" type="button">Limpiar</button>
+    </div>
+    <div id="console-log" class="console-log"></div>
+  </div>
+
+  <nav class="tabs">
+    <a href="#personal">Datos</a>
+    <a href="#experiencia">Experiencia</a>
+    <a href="#formacion">Formación</a>
+    <a href="#habilidades">Habilidades</a>
+  </nav>
+
+  <!-- ---------------- Datos personales ---------------- -->
+  <section id="personal">
+    <div class="section-head">
+      <h2>Datos personales</h2>
+    </div>
+
+    <div class="card" id="personal-view"></div>
+    <button class="add-btn" id="personal-edit-btn">Editar datos personales</button>
+
+    <form class="entry-form hidden" id="personal-form">
+      <div class="field"><label>Nombre</label><input type="text" name="nombre" required></div>
+      <div class="field-row">
+        <div class="field"><label>Email</label><input type="email" name="email"></div>
+        <div class="field"><label>Teléfono</label><input type="text" name="telefono"></div>
+      </div>
+      <div class="field"><label>Ciudad</label><input type="text" name="ciudad"></div>
+      <div class="field"><label>Resumen</label><textarea name="resumen" rows="3"></textarea></div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Guardar (PUT)</button>
+        <button type="button" class="btn secondary" data-cancel="personal-form">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ---------------- Experiencia laboral ---------------- -->
+  <section id="experiencia">
+    <div class="section-head">
+      <h2>Experiencia laboral</h2>
+    </div>
+
+    <div id="experiencia-list"></div>
+    <button class="add-btn" data-show-form="experiencia-form">+ Añadir experiencia</button>
+
+    <form class="entry-form hidden" id="experiencia-form" data-endpoint="/cv/experiencia">
+      <input type="hidden" name="record_id">
+      <div class="field"><label>Puesto</label><input type="text" name="puesto" required></div>
+      <div class="field"><label>Empresa</label><input type="text" name="empresa" required></div>
+      <div class="field-row">
+        <div class="field"><label>Inicio</label><input type="text" name="fecha_inicio" placeholder="2024-01"></div>
+        <div class="field"><label>Fin</label><input type="text" name="fecha_fin" placeholder="2024-06"></div>
+      </div>
+      <div class="field"><label>Descripción</label><textarea name="descripcion" rows="2"></textarea></div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Guardar</button>
+        <button type="button" class="btn secondary" data-cancel="experiencia-form">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ---------------- Formación académica ---------------- -->
+  <section id="formacion">
+    <div class="section-head">
+      <h2>Formación académica</h2>
+    </div>
+
+    <div id="formacion-list"></div>
+    <button class="add-btn" data-show-form="formacion-form">+ Añadir formación</button>
+
+    <form class="entry-form hidden" id="formacion-form" data-endpoint="/cv/formacion">
+      <input type="hidden" name="record_id">
+      <div class="field"><label>Institución</label><input type="text" name="institucion" required></div>
+      <div class="field"><label>Título</label><input type="text" name="titulo" required></div>
+      <div class="field-row">
+        <div class="field"><label>Inicio</label><input type="text" name="fecha_inicio" placeholder="2022"></div>
+        <div class="field"><label>Fin</label><input type="text" name="fecha_fin" placeholder="2026"></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Guardar</button>
+        <button type="button" class="btn secondary" data-cancel="formacion-form">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ---------------- Habilidades ---------------- -->
+  <section id="habilidades">
+    <div class="section-head">
+      <h2>Habilidades</h2>
+    </div>
+
+    <div id="habilidades-list"></div>
+    <button class="add-btn" data-show-form="habilidades-form">+ Añadir habilidad</button>
+
+    <form class="entry-form hidden" id="habilidades-form" data-endpoint="/cv/habilidades">
+      <input type="hidden" name="record_id">
+      <div class="field-row">
+        <div class="field"><label>Nombre</label><input type="text" name="nombre" required></div>
+        <div class="field"><label>Nivel</label>
+          <select name="nivel">
+            <option>Básico</option>
+            <option>Intermedio</option>
+            <option>Avanzado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Guardar</button>
+        <button type="button" class="btn secondary" data-cancel="habilidades-form">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+</div>
+
+<script>
+const API = ""; // mismo origen: FastAPI sirve este archivo y la API
+
+let toastTimer;
+const toastEl = document.getElementById('toast');
+function setStatus(text, isError){
+  toastEl.textContent = text;
+  toastEl.classList.toggle('err', !!isError);
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+}
+
+async function api(path, options){
+  const method = (options && options.method) || 'GET';
+  const reqBody = (options && options.body) || null;
+
+  const res = await fetch(API + path, options);
+  let rawText = '';
+  if(res.status !== 204){
+    rawText = await res.text();
+  }
+  logRequest(method, path, reqBody, res.status, rawText);
+
+  if(!res.ok){
+    let detail = res.statusText;
+    try{ const j = JSON.parse(rawText); detail = j.detail ? JSON.stringify(j.detail) : detail; }catch(e){}
+    throw new Error(`${res.status} ${detail}`);
+  }
+  if(res.status === 204) return null;
+  try{ return JSON.parse(rawText); }catch(e){ return null; }
+}
+
+function formatJSON(text){
+  if(text === null || text === undefined || text === '') return '(vacío)';
+  try{ return JSON.stringify(JSON.parse(text), null, 2); }catch(e){ return String(text); }
+}
+
+let requestCount = 0;
+const consoleLogEl = document.getElementById('console-log');
+const consoleCountEl = document.getElementById('console-count');
+const consolePanel = document.getElementById('console-panel');
+
+function logRequest(method, url, reqBody, status, resBody){
+  requestCount++;
+  consoleCountEl.textContent = requestCount;
+
+  const ok = status >= 200 && status < 300;
+  const entry = document.createElement('div');
+  entry.className = 'console-entry';
+  entry.innerHTML = `
+    <div class="console-entry-head">
+      <span class="console-method ${method.toLowerCase()}">${method}</span>
+      <span class="console-url">${esc(url)}</span>
+      <span class="console-status ${ok ? '' : 'err'}">${status}</span>
+    </div>
+    ${reqBody ? `<details><summary>request</summary><pre>${esc(formatJSON(reqBody))}</pre></details>` : ''}
+    <details><summary>response</summary><pre>${esc(formatJSON(resBody))}</pre></details>
+  `;
+  consoleLogEl.insertBefore(entry, consoleLogEl.firstChild);
+  while(consoleLogEl.children.length > 20){
+    consoleLogEl.removeChild(consoleLogEl.lastChild);
+  }
+}
+
+document.getElementById('console-toggle').addEventListener('click', () => {
+  consolePanel.classList.toggle('hidden');
+});
+document.getElementById('console-clear').addEventListener('click', () => {
+  consoleLogEl.innerHTML = '';
+  requestCount = 0;
+  consoleCountEl.textContent = '0';
+});
+
+function esc(s){
+  if(s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------------- Datos personales ----------------
+
+function renderPersonal(p){
+  document.getElementById('cv-nombre').textContent = p.nombre || 'Sin nombre';
+  document.getElementById('cv-resumen').textContent = p.resumen || '';
+  const contacto = document.getElementById('cv-contacto');
+  contacto.innerHTML = ['email','telefono','ciudad']
+    .filter(k => p[k])
+    .map(k => `<span>${esc(p[k])}</span>`).join('');
+
+  document.getElementById('personal-view').innerHTML = `
+    <h3>${esc(p.nombre || '')}</h3>
+    <p class="meta">${[p.email, p.telefono, p.ciudad].filter(Boolean).map(esc).join(' · ')}</p>
+    <p class="desc">${esc(p.resumen || '')}</p>
+  `;
+
+  const form = document.getElementById('personal-form');
+  form.nombre.value = p.nombre || '';
+  form.email.value = p.email || '';
+  form.telefono.value = p.telefono || '';
+  form.ciudad.value = p.ciudad || '';
+  form.resumen.value = p.resumen || '';
+}
+
+document.getElementById('personal-edit-btn').addEventListener('click', () => {
+  document.getElementById('personal-form').classList.toggle('hidden');
+});
+
+document.getElementById('personal-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const payload = {
+    nombre: form.nombre.value,
+    email: form.email.value || null,
+    telefono: form.telefono.value || null,
+    ciudad: form.ciudad.value || null,
+    resumen: form.resumen.value || null,
+  };
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<span class="spinner"></span>Guardando…`;
+  try{
+    setStatus('Enviando PUT /cv/datos-personales…');
+    const updated = await api('/cv/datos-personales', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    renderPersonal(updated);
+    form.classList.add('hidden');
+    setStatus('Datos personales actualizados.');
+  }catch(err){ setStatus(err.message, true); }
+  finally{
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+});
+
+// ---------------- Secciones tipo lista (experiencia / formación / habilidades) ----------------
+
+const sections = {
+  experiencia: {
+    listId: 'experiencia-list',
+    formId: 'experiencia-form',
+    endpoint: '/cv/experiencia',
+    empty: 'Aún no hay experiencia registrada.',
+    card: (item) => `
+      <h3>${esc(item.puesto)}</h3>
+      <p class="meta">${esc(item.empresa)} · ${esc(item.fecha_inicio || '')} – ${esc(item.fecha_fin || 'actualidad')}</p>
+      ${item.descripcion ? `<p class="desc">${esc(item.descripcion)}</p>` : ''}
+    `,
+    fields: ['puesto','empresa','fecha_inicio','fecha_fin','descripcion'],
+  },
+  formacion: {
+    listId: 'formacion-list',
+    formId: 'formacion-form',
+    endpoint: '/cv/formacion',
+    empty: 'Aún no hay formación académica registrada.',
+    card: (item) => `
+      <h3>${esc(item.titulo)}</h3>
+      <p class="meta">${esc(item.institucion)} · ${esc(item.fecha_inicio || '')} – ${esc(item.fecha_fin || '')}</p>
+    `,
+    fields: ['institucion','titulo','fecha_inicio','fecha_fin'],
+  },
+  habilidades: {
+    listId: 'habilidades-list',
+    formId: 'habilidades-form',
+    endpoint: '/cv/habilidades',
+    empty: 'Aún no hay habilidades registradas.',
+    card: (item) => `
+      <h3>${esc(item.nombre)}</h3>
+      <p class="meta">${esc(item.nivel || '')}</p>
+    `,
+    fields: ['nombre','nivel'],
+  },
+};
+
+const cache = { experiencia: [], formacion: [], habilidades: [] };
+const confirmDeleteIds = new Set();
+
+function fadeIn(el){
+  el.classList.remove('fade-in');
+  void el.offsetWidth; // fuerza reflow para reiniciar la animación
+  el.classList.add('fade-in');
+}
+
+function renderList(key, items){
+  cache[key] = items;
+  const cfg = sections[key];
+  const container = document.getElementById(cfg.listId);
+  if(!items.length){
+    container.innerHTML = `<p class="empty-hint">${cfg.empty}</p>`;
+    return;
+  }
+  container.innerHTML = items.map(item => {
+    const confirming = confirmDeleteIds.has(`${key}:${item.id}`);
+    return `
+    <div class="card" data-id="${item.id}">
+      <div class="card-top">
+        <div>${cfg.card(item)}</div>
+        <div class="card-actions">
+          ${confirming ? `
+            <span class="confirm-text">¿Eliminar?</span>
+            <button data-action="confirm-delete" data-section="${key}" data-id="${item.id}" class="btn-mini-danger">Sí</button>
+            <button data-action="cancel-delete" data-section="${key}" data-id="${item.id}">No</button>
+          ` : `
+            <button data-action="edit" data-section="${key}" data-id="${item.id}">Editar</button>
+            <button data-action="delete" data-section="${key}" data-id="${item.id}" class="danger">Eliminar</button>
+          `}
+        </div>
+      </div>
+    </div>
+  `;}).join('');
+  fadeIn(container);
+}
+
+document.querySelectorAll('[data-show-form]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const formId = btn.dataset.showForm;
+    const form = document.getElementById(formId);
+    form.reset();
+    form.id_hidden_value = '';
+    form.querySelector('input[name="record_id"]').value = '';
+    form.classList.remove('hidden');
+  });
+});
+
+document.querySelectorAll('[data-cancel]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById(btn.dataset.cancel).classList.add('hidden');
+  });
+});
+
+document.querySelectorAll('form.entry-form[data-endpoint]').forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const key = form.id.replace('-form','');
+    const cfg = sections[key];
+    const id = form.querySelector('input[name="record_id"]').value;
+    const payload = {};
+    cfg.fields.forEach(f => { payload[f] = form[f].value || null; });
+
+    const isEdit = !!id;
+    const url = isEdit ? `${cfg.endpoint}/${id}` : cfg.endpoint;
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner"></span>Guardando…`;
+
+    try{
+      await api(url, {
+        method,
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      form.reset();
+      form.classList.add('hidden');
+      setStatus(`${isEdit ? 'Registro actualizado' : 'Registro creado'} correctamente.`);
+      await loadSection(key);
+    }catch(err){ setStatus(err.message, true); }
+    finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+});
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const { action, section: key, id } = btn.dataset;
+  const cfg = sections[key];
+
+  if(action === 'delete'){
+    confirmDeleteIds.add(`${key}:${id}`);
+    renderList(key, cache[key]);
+    return;
+  }
+
+  if(action === 'cancel-delete'){
+    confirmDeleteIds.delete(`${key}:${id}`);
+    renderList(key, cache[key]);
+    return;
+  }
+
+  if(action === 'confirm-delete'){
+    confirmDeleteIds.delete(`${key}:${id}`);
+    const card = btn.closest('.card');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span>Eliminando…`;
+    if(card) card.classList.add('card-removing');
+    try{
+      await Promise.all([
+        api(`${cfg.endpoint}/${id}`, { method:'DELETE' }),
+        new Promise(resolve => setTimeout(resolve, 280))
+      ]);
+      setStatus('Registro eliminado.');
+      await loadSection(key);
+    }catch(err){
+      if(card) card.classList.remove('card-removing');
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+      setStatus(err.message, true);
+    }
+    return;
+  }
+
+  if(action === 'edit'){
+    try{
+      const item = await api(`${cfg.endpoint}/${id}`);
+      const form = document.getElementById(cfg.formId);
+      form.classList.remove('hidden');
+      form.querySelector('input[name="record_id"]').value = item.id;
+      cfg.fields.forEach(f => { if(form[f]) form[f].value = item[f] || ''; });
+      form.scrollIntoView({behavior:'smooth', block:'center'});
+    }catch(err){ setStatus(err.message, true); }
+  }
+});
+
+async function loadSection(key){
+  const cfg = sections[key];
+  const items = await api(cfg.endpoint);
+  renderList(key, items);
+}
+
+async function loadAll(){
+  try{
+    const cv = await api('/cv');
+    renderPersonal(cv.datos_personales || {});
+    renderList('experiencia', cv.experiencia_laboral || []);
+    renderList('formacion', cv.formacion_academica || []);
+    renderList('habilidades', cv.habilidades || []);
+    setStatus('GET /cv — datos cargados correctamente.');
+  }catch(err){
+    setStatus('No se pudo conectar con la API: ' + err.message, true);
+  }
+}
+
+loadAll();
+</script>
+
+</body>
+</html>
