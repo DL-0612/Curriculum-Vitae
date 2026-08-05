@@ -7,7 +7,7 @@ directamente con Postgres/SQLite.
 """
 from sqlalchemy import Column, Integer, String
 
-from cv.database import Base
+from database import Base
 
 
 class DatosPersonalesDB(Base):
