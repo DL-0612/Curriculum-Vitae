@@ -56,7 +56,6 @@ def orm_to_dict(obj) -> dict:
 
 
 def get_or_create_personal(db: Session) -> DatosPersonalesDB:
-    """Los datos personales viven en una sola fila (id=1). La crea si no existe."""
     personal = db.query(DatosPersonalesDB).filter(DatosPersonalesDB.id == 1).first()
     if not personal:
         personal = DatosPersonalesDB(id=1, nombre="Sin nombre")
@@ -68,7 +67,6 @@ def get_or_create_personal(db: Session) -> DatosPersonalesDB:
 
 @app.get("/cv", tags=["CV completo"])
 def obtener_cv_completo(db: Session = Depends(get_db)):
-    """Regresa el CV completo: datos personales, experiencia, formación y habilidades."""
     return {
         "datos_personales": orm_to_dict(get_or_create_personal(db)),
         "experiencia_laboral": [orm_to_dict(x) for x in db.query(ExperienciaLaboralDB).all()],
