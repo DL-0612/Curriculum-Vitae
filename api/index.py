@@ -1,11 +1,3 @@
-"""
-Punto de entrada para Vercel.
-
-Vercel ejecuta funciones Python en un entorno tipo AWS Lambda, así que
-no puede correr uvicorn directamente. Mangum adapta nuestra app ASGI
-(FastAPI) a ese formato. Render/Railway NO necesitan este archivo
-(ellos sí corren uvicorn normal); esto es exclusivo para Vercel.
-"""
 import sys
 import os
 

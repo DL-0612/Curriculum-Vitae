@@ -1,15 +1,7 @@
-"""
-Modelos Pydantic usados por la API.
-
-Aquí se valida que los datos recibidos cumplan con los formatos
-requeridos: campos obligatorios no vacíos, email con formato válido,
-fechas en formato AAAA o AAAA-MM, y nivel de habilidad restringido
-a un catálogo fijo.
-"""
 from typing import Optional, Literal
 from pydantic import BaseModel, EmailStr, Field
 
-# AAAA o AAAA-M o AAAA-MM (ej. "2024", "2024-1" o "2024-01")
+
 PATRON_FECHA = r"^\d{4}(-\d{1,2})?$"
 
 
