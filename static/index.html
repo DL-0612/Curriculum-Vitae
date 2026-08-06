@@ -40,8 +40,6 @@
     padding:48px 24px 96px;
   }
 
-  /* ---------- Masthead ---------- */
-
   .masthead{
     border-bottom:2px solid var(--ink);
     padding-bottom:24px;
@@ -88,7 +86,6 @@
   }
   .contact-line span:first-child::before{ content:none; margin:0; }
 
-  /* ---------- Folder tabs nav ---------- */
 
   nav.tabs{
     display:flex;
@@ -112,7 +109,6 @@
   }
   nav.tabs a:hover{ color:var(--ink); background:var(--accent-soft); }
 
-  /* ---------- Sections ---------- */
 
   section{ margin-bottom:52px; scroll-margin-top:20px; }
 
@@ -128,8 +124,6 @@
     font-size:22px;
     margin:0;
   }
-
-  /* ---------- Cards ---------- */
 
   .card{
     background:var(--panel);
@@ -183,8 +177,6 @@
     font-style:italic;
     padding:6px 0 14px;
   }
-
-  /* ---------- Forms ---------- */
 
   form.entry-form{
     background:var(--accent-soft);
@@ -281,8 +273,6 @@
     .console-panel{ width:calc(100vw - 32px); left:16px; right:16px; }
   }
 
-  /* ---------- Spinner ---------- */
-
   .spinner{
     display:inline-block;
     width:11px; height:11px;
@@ -296,8 +286,6 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
   button:disabled{ opacity:.65; cursor:default; }
 
-  /* ---------- Confirmación inline de eliminar ---------- */
-
   .confirm-text{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -310,8 +298,6 @@
     color:#fff;
   }
   .card-actions button.btn-mini-danger:hover{ opacity:.9; color:#fff; }
-
-  /* ---------- Animaciones de tarjetas ---------- */
 
   .card{
     max-height:600px;
@@ -334,8 +320,6 @@
     to{ opacity:1; transform:translateY(0); }
   }
   .fade-in{ animation:fadeInUp .35s ease; }
-
-  /* ---------- Consola de peticiones API ---------- */
 
   .console-toggle{
     position:fixed;
@@ -492,7 +476,6 @@
     <a href="#habilidades">Habilidades</a>
   </nav>
 
-  <!-- ---------------- Datos personales ---------------- -->
   <section id="personal">
     <div class="section-head">
       <h2>Datos personales</h2>
@@ -516,7 +499,6 @@
     </form>
   </section>
 
-  <!-- ---------------- Experiencia laboral ---------------- -->
   <section id="experiencia">
     <div class="section-head">
       <h2>Experiencia laboral</h2>
@@ -541,7 +523,6 @@
     </form>
   </section>
 
-  <!-- ---------------- Formación académica ---------------- -->
   <section id="formacion">
     <div class="section-head">
       <h2>Formación académica</h2>
@@ -565,7 +546,6 @@
     </form>
   </section>
 
-  <!-- ---------------- Habilidades ---------------- -->
   <section id="habilidades">
     <div class="section-head">
       <h2>Habilidades</h2>
@@ -596,7 +576,7 @@
 </div>
 
 <script>
-const API = ""; // mismo origen: FastAPI sirve este archivo y la API
+const API = "";
 
 let toastTimer;
 const toastEl = document.getElementById('toast');
@@ -674,7 +654,6 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// ---------------- Datos personales ----------------
 
 function renderPersonal(p){
   document.getElementById('cv-nombre').textContent = p.nombre || 'Sin nombre';
@@ -733,8 +712,6 @@ document.getElementById('personal-form').addEventListener('submit', async (e) =>
   }
 });
 
-// ---------------- Secciones tipo lista (experiencia / formación / habilidades) ----------------
-
 const sections = {
   experiencia: {
     listId: 'experiencia-list',
@@ -777,7 +754,7 @@ const confirmDeleteIds = new Set();
 
 function fadeIn(el){
   el.classList.remove('fade-in');
-  void el.offsetWidth; // fuerza reflow para reiniciar la animación
+  void el.offsetWidth; 
   el.classList.add('fade-in');
 }
 

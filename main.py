@@ -1,11 +1,3 @@
-"""
-API REST para gestionar un Currículum Vítae (CV).
-U4 > E1 - Implementación y despliegue de API
-
-Persistencia: PostgreSQL en producción (vía variable de entorno
-DATABASE_URL), con SQLite como respaldo para desarrollo local.
-Ver database.py y db_models.py.
-"""
 import os
 
 from fastapi import FastAPI, HTTPException, Request, Depends, status
@@ -23,7 +15,6 @@ from db_models import (
 )
 from models import DatosPersonales, ExperienciaLaboral, FormacionAcademica, Habilidad
 
-# Crea las tablas en la base de datos si todavía no existen.
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -32,8 +23,6 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Orígenes permitidos para CORS, configurable por variable de entorno.
-# Por defecto "*" (cualquier origen) para simplificar pruebas con Postman/navegador.
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -43,11 +32,6 @@ app.add_middleware(
 )
 
 
-# ------------------------------------------------------------------
-# Manejo global de errores: la API SIEMPRE responde en JSON,
-# incluso ante una excepción no prevista (nunca tumba el servidor).
-# ------------------------------------------------------------------
-
 @app.exception_handler(Exception)
 async def manejador_errores_generales(request: Request, exc: Exception):
     return JSONResponse(
@@ -56,25 +40,16 @@ async def manejador_errores_generales(request: Request, exc: Exception):
     )
 
 
-# ------------------------------------------------------------------
-# Frontend (página HTML que consume la API)
-# ------------------------------------------------------------------
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 @app.get("/", include_in_schema=False)
 def serve_frontend():
-    """Sirve la página HTML que consume la API y muestra el CV visualmente."""
     return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
 
 
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
-
-# ------------------------------------------------------------------
-# Utilidad: convierte una fila ORM de SQLAlchemy en un dict serializable
-# ------------------------------------------------------------------
 
 def orm_to_dict(obj) -> dict:
     return {c.name: getattr(obj, c.name) for c in obj.__table__.columns}
@@ -91,10 +66,6 @@ def get_or_create_personal(db: Session) -> DatosPersonalesDB:
     return personal
 
 
-# ------------------------------------------------------------------
-# CV completo
-# ------------------------------------------------------------------
-
 @app.get("/cv", tags=["CV completo"])
 def obtener_cv_completo(db: Session = Depends(get_db)):
     """Regresa el CV completo: datos personales, experiencia, formación y habilidades."""
@@ -105,10 +76,6 @@ def obtener_cv_completo(db: Session = Depends(get_db)):
         "habilidades": [orm_to_dict(x) for x in db.query(HabilidadDB).all()],
     }
 
-
-# ------------------------------------------------------------------
-# Datos personales (fila única)
-# ------------------------------------------------------------------
 
 @app.get("/cv/datos-personales", tags=["Datos personales"])
 def obtener_datos_personales(db: Session = Depends(get_db)):
@@ -124,10 +91,6 @@ def actualizar_datos_personales(datos: DatosPersonales, db: Session = Depends(ge
     db.refresh(personal)
     return orm_to_dict(personal)
 
-
-# ------------------------------------------------------------------
-# Experiencia laboral
-# ------------------------------------------------------------------
 
 @app.get("/cv/experiencia", tags=["Experiencia laboral"])
 def listar_experiencia(db: Session = Depends(get_db)):
@@ -173,10 +136,6 @@ def eliminar_experiencia(item_id: int, db: Session = Depends(get_db)):
     return None
 
 
-# ------------------------------------------------------------------
-# Formación académica
-# ------------------------------------------------------------------
-
 @app.get("/cv/formacion", tags=["Formación académica"])
 def listar_formacion(db: Session = Depends(get_db)):
     return [orm_to_dict(x) for x in db.query(FormacionAcademicaDB).all()]
@@ -220,10 +179,6 @@ def eliminar_formacion(item_id: int, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-
-# ------------------------------------------------------------------
-# Habilidades
-# ------------------------------------------------------------------
 
 @app.get("/cv/habilidades", tags=["Habilidades"])
 def listar_habilidades(db: Session = Depends(get_db)):
